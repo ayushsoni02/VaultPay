@@ -1,1 +1,3 @@
-export const JWT_SECRET = 'ayush1234567';
+module.exports = {
+  JWT_SECRET:'ayush1234567'
+}
