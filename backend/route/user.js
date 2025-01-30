@@ -12,11 +12,11 @@ const { userMiddleware } = require('../middleware.js');
 //                    ----        sign out  route   ---------
 
 userRouter.post('/signup', async (req, res) => {
-  const { userName, password, firstName, lastName } = req.body;
+  const { email, password, firstName, lastName } = req.body;
 
 
   const requiredBody = z.object({
-    userName: z.string().min(4, "Username must be at least 4 characters long"),
+    email: z.string().email(),
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     password: z.string()
@@ -44,16 +44,16 @@ userRouter.post('/signup', async (req, res) => {
 
   try {
 
-     // Check if username already exists in the database
-     const existingUser = await userModel.findOne({ userName });
+     // Check if email already exists in the database
+     const existingUser = await userModel.findOne({ email });
      if (existingUser) {
        return res.status(409).json({
-         message: "Username is already taken. Please choose a different one."
+         message: "email is already taken. Please choose a different one."
        });
      }
     
    const user =  await userModel.create({
-      userName,
+      email,
       firstName,
       lastName,
       password: hashedPassword
@@ -88,7 +88,7 @@ userRouter.post('/signup', async (req, res) => {
   } catch (error) {
     console.error("Error during signup:", error);
     res.status(500).json({
-      message: "Username already taken or incorrect input"
+      message: "email already taken or incorrect input"
     });
   }
 });
@@ -98,14 +98,14 @@ userRouter.post('/signup', async (req, res) => {
 
 
 userRouter.post('/signin', async (req, res) => {
-    const { userName, password } = req.body;
+    const { email, password } = req.body;
   
     try {
       // Check if user exists
-      const user = await userModel.findOne({ userName });
+      const user = await userModel.findOne({ email });
       if (!user) {
         return res.status(404).json({
-          message: "User not found. Please check your username."
+          message: "User not found. Please check your email."
         });
       }
   
@@ -120,7 +120,7 @@ userRouter.post('/signin', async (req, res) => {
       
       // Generate a token
       const token = jwt.sign(
-        { userId: user._id, userName: user.userName },
+        { userId: user._id, email: user.email },
         JWT_SECRET,
         { expiresIn: '1h' }
       );
@@ -137,7 +137,7 @@ userRouter.post('/signin', async (req, res) => {
         token,
         user: {
           id: user._id,
-          userName: user.userName,
+          email: user.email,
           firstName: user.firstName,
           lastName: user.lastName
         }
@@ -207,32 +207,27 @@ userRouter.put('/', userMiddleware, async (req, res) => {
 
   userRouter.get('/bulk', userMiddleware, async (req, res) => {
     try {
-       const filter = req.query.filter || ""; 
- 
-       
-       const query = filter ? {
-          $or: [
-             { firstName: { "$regex": filter, "$options": "i" } },
-             { lastName: { "$regex": filter, "$options": "i" } }
-          ]
-       } : {}; // If no filter, return all users
- 
-       const users = await userModel.find(query);
- 
-       res.json({
-          users: users.map(user => ({
-             userName: user.userName,
-             firstName: user.firstName,
-             lastName: user.lastName,
-             _id: user._id
-          }))
-       });
- 
+        const filter = req.query.filter || ""; 
+        const userId = req.user.id;
+
+        const query = filter ? {
+            $or: [
+                { firstName: { $regex: filter, $options: "i" } },
+                { lastName: { $regex: filter, $options: "i" } }
+            ],
+            _id: { $ne: userId } // Exclude the logged-in user
+        } : { _id: { $ne: userId } };
+
+        const users = await userModel.find(query).select("email firstName lastName _id").lean();
+
+        res.json({ users });
     } catch (error) {
-       console.error("Error fetching users:", error);
-       res.status(500).json({ message: "Internal Server Error" });
+        console.error("Error fetching users:", error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
- });
+});
+
+
  
 
 
