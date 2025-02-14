@@ -39,7 +39,7 @@ userRouter.post('/signup', async (req, res) => {
     });
   }
 
-
+  
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
@@ -52,12 +52,15 @@ userRouter.post('/signup', async (req, res) => {
        });
      }
     
+
+
    const user =  await userModel.create({
       email,
       firstName,
       lastName,
       password: hashedPassword
     });
+
 
     if (!user || !user._id) {
       return res.status(500).json({ message: "User creation failed" });
@@ -80,7 +83,8 @@ userRouter.post('/signup', async (req, res) => {
         sameSite: 'strict'
       });
 
-  
+      localStorage.setItem("token", response.data.token);
+
     res.json({
       message: "Signup succeeded",
       token
@@ -132,6 +136,7 @@ userRouter.post('/signin', async (req, res) => {
         sameSite: 'strict'
       });
       
+
       res.json({
         message: "Signin succeeded",
         token,
@@ -153,10 +158,10 @@ userRouter.post('/signin', async (req, res) => {
 
               //      --- logout route  --- 
 
-              userRouter.post('/logout', (req, res) => {
-                res.cookie('token', '', { maxAge: 0 }); // Expire the cookie immediately
-                res.json({ message: "Logged out successfully" });
-              });
+     userRouter.post('/logout', (req, res) => {
+    res.cookie('token', '', { maxAge: 0 }); // Expire the cookie immediately
+     res.json({ message: "Logged out successfully" });
+    });
 
 
 
@@ -208,7 +213,7 @@ userRouter.put('/', userMiddleware, async (req, res) => {
   userRouter.get('/bulk', userMiddleware, async (req, res) => {
     try {
         const filter = req.query.filter || ""; 
-        const userId = req.user.id;
+        const userId = req.userId; 
 
         const query = filter ? {
             $or: [
@@ -220,7 +225,7 @@ userRouter.put('/', userMiddleware, async (req, res) => {
 
         const users = await userModel.find(query).select("email firstName lastName _id").lean();
 
-        res.json({ users });
+        res.json({ user: users });
     } catch (error) {
         console.error("Error fetching users:", error);
         res.status(500).json({ message: "Internal Server Error" });

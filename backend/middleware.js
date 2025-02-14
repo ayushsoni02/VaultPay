@@ -22,6 +22,7 @@ const userMiddleware = async (req, res, next) => {
     
     // Attach the user ID to the request for later use
     req.userId = decoded.userId;
+        req.user = { id: decoded.userId };
 
     next();
   } catch (error) {

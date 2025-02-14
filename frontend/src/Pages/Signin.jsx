@@ -17,9 +17,11 @@ export const Signin = () => {
         try {
             const email = emailRef.current?.value;
             const password = passwordRef.current?.value;
-
-            const response = await axios.post(`${BACKEND_URL}/v1/user/signin`, { email, password });
-
+            
+            console.log("email and password",email,password);
+            
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, { email, password });
+    
             const jwt = response.data.token;
             localStorage.setItem("token", jwt);
             alert("You have signed in successfully!");
@@ -33,7 +35,7 @@ export const Signin = () => {
         <div className="bg-slate-300 h-screen flex justify-center">
             <div className="flex flex-col justify-center">
                 <div className="rounded-lg bg-white w-80 text-center p-2 h-max px-4">
-                    <Heading label={"Sign up"} />
+                    <Heading label={"Sign in"} />
                     <SubHeading label="Enter your credentials to access your account" />
                     <InputBox placeholder="johndoe@gmail.com" label="Email" ref={emailRef} />
                     <InputBox placeholder="********" label="Password" type="password" ref={passwordRef} />
