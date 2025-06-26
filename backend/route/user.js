@@ -232,8 +232,22 @@ userRouter.put('/', userMiddleware, async (req, res) => {
     }
 });
 
+// --------------   /me route  --------------
 
- 
+
+userRouter.get('/me', userMiddleware, async (req, res) => {
+  try {
+    const user = await userModel.findById(req.userId).select("firstName lastName email");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 
 module.exports = {
