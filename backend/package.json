@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watchAll --detectOpenHandles --setupFiles dotenv/config",
+    "test:coverage": "jest --coverage --setupFiles dotenv/config",
+    "test:ci": "jest --ci --coverage --setupFiles dotenv/config"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,11 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17"
+    "@types/cors": "^2.8.17",
+    "@types/jest": "^30.0.0",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.1.4"
   }
 }

@@ -51,6 +51,9 @@ userRouter.post('/signup', async (req, res) => {
          message: "email is already taken. Please choose a different one."
        });
      }
+
+     console.log("pass the existingUser");
+     
     
 
 
@@ -61,10 +64,13 @@ userRouter.post('/signup', async (req, res) => {
       password: hashedPassword
     });
 
+    console.log("pass the user");
 
     if (!user || !user._id) {
       return res.status(500).json({ message: "User creation failed" });
     }
+ 
+     console.log("pass the user_id");
 
     await AccountModel.create({
       userId:user._id,
@@ -83,7 +89,7 @@ userRouter.post('/signup', async (req, res) => {
         sameSite: 'strict'
       });
 
-      localStorage.setItem("token", response.data.token);
+      // localStorage.setItem("token", response.data.token);
 
     res.json({
       message: "Signup succeeded",
