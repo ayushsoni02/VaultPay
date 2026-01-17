@@ -55,11 +55,11 @@ The platform features a unique **Vault** system that allows users to securely sa
 
 <div align="center">
 
-<!-- | Landing Page | Dashboard | -->
+| Dashboard | Locked vault |
 |:---:|:---:|
 | ![Landing](frontend/public/image-1.png) | ![Dashboard](frontend/public/image-2.png) |
 
-<!-- | Send Money | Transaction History | -->
+| Send Money | Transaction History |
 |:---:|:---:|
 | ![Send](frontend/public/image-3.png) | ![History](frontend/public/image-4.png) |
 
